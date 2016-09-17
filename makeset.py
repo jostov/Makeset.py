@@ -26,7 +26,7 @@ def part_data(data, partition):
   remainder_data = {}
   for each in data:
     partition_point = int(len(data[each])*partition)
-    partition_data[each] = data[each][:partition_point]
+    partition_data[each] = data[each][:partition_point+1]
     remainder_data[each] = data[each][partition_point:]
   return [partition_data, remainder_data]
 
