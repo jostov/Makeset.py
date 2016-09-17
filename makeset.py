@@ -61,6 +61,7 @@ def get_zeros(number):
 
 state = None
 params = {}
+# Default options
 # Portion of data to be set aside for parameter tuning
 params['p'] = .266666
 # Number of folds to use for cross validation
@@ -68,29 +69,54 @@ params['k'] = 10
 # Number of folds to use for parameter tuning
 params['j'] = 5
 # Current output directory
-params['o'] = '.'
+params['o'] = 'output'
+
+# Parse out the arguments 
+args = sys.argv
+for each in args[1:]:      # for each arg
+  if each.startswith('-'): # capture the flags
+    k = args.pop(args.index(each)) # pop each arg
+
+    # Parse command line options and record values
+    if k[1] is 'p':
+      if float(k[2:]) >= 1:
+        print "Bad partition-value"
+        quit()
+      params[k[1]]=float(k[2:])
+
+    elif k[1] is 'k':
+      if int(k[2:]) <= 1:
+        print "Bad k-fold value, this hurts me physically"
+        quit()
+      params[k[1]]=int(k[2:])
+
+    elif k[1] is 'j':
+      if int(k[2:]) <= 1:
+        print "Bad j-fold value, this hurts me physically"
+        quit()
+      params[k[1]]=int(k[2:])
+
+    elif k[1] is 'o':
+      if k[2] is not '=':
+        print "Args are formatted wrong"
+        quit()
+      params[k[1]]=k[3:-1] if k[3:].endswith('/') else k[3:] 
 
 # Iterating over files in path list
-paths = sys.argv[1:]
-for file_name in paths:
+data = {}
+if len(args[1:]) < 1:
+  print "Partitioned nothing successfully"
+  quit()
+for file_name in args[1:]:
   basename = ''
   if state is not None:
     random.setstate(state)
   if not os.path.isfile(file_name):
-    print file_name + ' was not found.'
+    print file_name + ' was not found. Could not add data to batch'
     continue
-  print "Attempting to partition data from " + file_name
-
-  # Creating output directory 
-  try:
-    basename = params['o'] + '/' + os.path.split(file_name)[-1][:-4]
-    os.mkdir(basename)
-  except OSError:
-    print "failed to create output directory for " + file_name
-    continue
-
+  print "Attempting to parse data from " + file_name
+  
   # Parsing file
-  data = {}
   for each in open(file_name, "r").readlines():
     key = str(each).split()[0]
     if key not in data:
@@ -99,29 +125,40 @@ for file_name in paths:
       a = [float(x) for x in each.split()[1:-1]]
       a.append(each.split()[-1])
       data[key].append(a)
-  datlist = part_data(shuffle_data(data), params['p'])
-  tuning = split_data(datlist[0], params['j'])
-  validation = split_data(datlist[1], params['k'])
 
-  # Writing tuning folds
-  x = get_zeros(params['j'])
-  for each in sorted(tuning, key=int):
-    with open(basename + '/' + file_name[:-4] + "_tuning_fold_" + \
-        str(int(each)).zfill(x)+'.txt', 'a') as f:
-      nu = '\n'
-      for a in sorted(tuning[each], key=int):
-        for j in tuning[each][a]:
-          f.write(a + "\t" + "\t".join(map(str, j)) + nu)
 
-  # Writing validation folds
-  x = get_zeros(params['k'])
-  for each in sorted(validation, key=int):
-    with open(basename + '/' + file_name[:-4] + "_validation_fold_" + \
-        str(int(each)).zfill(x)+'.txt', 'a') as f:
-      nu = '\n'
-      for a in sorted(validation[each], key=int):
-        for j in validation[each][a]:
-          f.write(a + "\t" + "\t".join(map(str, j)) + nu)
+# Creating output directory 
+try:
+  basename = params['o'] 
+  os.mkdir(basename)
+except OSError:
+  print "failed to create output directory for " + file_name
+  quit()
 
-  print "Successfully partitioned " + str(file_name)
+
+datlist = part_data(shuffle_data(data), params['p'])
+tuning = split_data(datlist[0], params['j'])
+validation = split_data(datlist[1], params['k'])
+
+# Writing tuning folds
+x = get_zeros(params['j'])
+for each in sorted(tuning, key=int):
+  with open(basename + '/' + file_name[:-4] + "_tuning_fold_" + \
+      str(int(each)).zfill(x)+'.txt', 'a') as f:
+    nu = '\n'
+    for a in sorted(tuning[each], key=int):
+      for j in tuning[each][a]:
+        f.write(a + "\t" + "\t".join(map(str, j)) + nu)
+
+# Writing validation folds
+x = get_zeros(params['k'])
+for each in sorted(validation, key=int):
+  with open(basename + '/' + file_name[:-4] + "_validation_fold_" + \
+      str(int(each)).zfill(x)+'.txt', 'a') as f:
+    nu = '\n'
+    for a in sorted(validation[each], key=int):
+      for j in validation[each][a]:
+        f.write(a + "\t" + "\t".join(map(str, j)) + nu)
+
+print "Successfully partitioned batch" 
 
