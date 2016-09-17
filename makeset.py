@@ -56,6 +56,7 @@ def get_zeros(number):
     if number / c**x == 0:
       break
     x+= 1
+  x = 2 if x == 1 else x
   return x
 
 state = None
@@ -98,7 +99,7 @@ for file_name in paths:
       a = [float(x) for x in each.split()[1:-1]]
       a.append(each.split()[-1])
       data[key].append(a)
-  datlist = part_data(shuffle_data(data), .266666)
+  datlist = part_data(shuffle_data(data), params['p'])
   tuning = split_data(datlist[0], params['j'])
   validation = split_data(datlist[1], params['k'])
 
@@ -106,7 +107,7 @@ for file_name in paths:
   x = get_zeros(params['j'])
   for each in sorted(tuning, key=int):
     with open(basename + '/' + file_name[:-4] + "_tuning_fold_" + \
-        str(int(each)).zfill(x), 'a') as f:
+        str(int(each)).zfill(x)+'.txt', 'a') as f:
       nu = '\n'
       for a in sorted(tuning[each], key=int):
         for j in tuning[each][a]:
@@ -116,7 +117,7 @@ for file_name in paths:
   x = get_zeros(params['k'])
   for each in sorted(validation, key=int):
     with open(basename + '/' + file_name[:-4] + "_validation_fold_" + \
-        str(int(each)).zfill(x), 'a') as f:
+        str(int(each)).zfill(x)+'.txt', 'a') as f:
       nu = '\n'
       for a in sorted(validation[each], key=int):
         for j in validation[each][a]:
