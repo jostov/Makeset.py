@@ -26,7 +26,7 @@ def part_data(data, partition):
   remainder_data = {}
   for each in data:
     partition_point = int(len(data[each])*partition)
-    partition_data[each] = data[each][:partition_point+1]
+    partition_data[each] = data[each][:partition_point]
     remainder_data[each] = data[each][partition_point:]
   return [partition_data, remainder_data]
 
@@ -42,10 +42,14 @@ def split_data(data, folds):
     fold[i+1] = []
     current_fold = {}
     for each in sorted(data, key=int):
-      floor = 0 if i == 0 else i * fold_length[each] 
-      ceiling = (i + 1) * fold_length[each]
-      current_fold[each] = data[each][floor:ceiling]
+      current_fold[each] = []
+      for j in range(fold_length[each]):
+        current_fold[each].append(data[each].pop())
     fold[i+1] = dict(current_fold)
+  for i in fold:
+    for each in data:
+      if len(data[each]) != 0:
+        fold[i][each].append(data[each].pop())
   return fold
 
 # Determines necessary number of leading zeroes
