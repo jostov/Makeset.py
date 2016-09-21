@@ -44,7 +44,8 @@ def split_data(data, folds):
   for i in fold:
     for each in data:
       if len(data[each]) != 0:
-        fold[i][each].append(data[each].pop())
+        fold[i][each].append(data[each].pop(\
+            random.randint(0,len(data[each])-1)))
   return fold
 
 # Determines necessary number of leading zeroes
