@@ -131,7 +131,7 @@ try:
   basename = params['o'] 
   os.mkdir(basename)
 except OSError:
-  print "failed to create output directory for " + file_name
+  print "failed to create output directory: " + params['o']
   quit()
 
 
