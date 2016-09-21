@@ -9,12 +9,6 @@
 #
 import sys, os, random
 
-# This disorders the data dictionary
-def shuffle_data(data):
-  for each in data:
-    random.shuffle(data[each])
-  return data
-
 # This function splits a dictionary of feature lists into
 # two different dictionaries, a partition with some partition%
 # of each key's associated list, and a remainder dictionary, with
@@ -44,7 +38,8 @@ def split_data(data, folds):
     for each in sorted(data, key=int):
       current_fold[each] = []
       for j in range(fold_length[each]):
-        current_fold[each].append(data[each].pop())
+        current_fold[each].append(data[each].pop(\
+            random.randint(0,len(data[each])-1)))
     fold[i+1] = dict(current_fold)
   for i in fold:
     for each in data:
@@ -140,14 +135,14 @@ except OSError:
   quit()
 
 
-datlist = part_data(shuffle_data(data), params['p'])
+datlist = part_data(data, params['p'])
 tuning = split_data(datlist[0], params['j'])
 validation = split_data(datlist[1], params['k'])
 
 # Writing tuning folds
 x = get_zeros(params['j'])
 for each in sorted(tuning, key=int):
-  with open(basename + '/' + file_name[:-4] + "_tuning_fold_" + \
+  with open(basename + '/' + params['o'] + "_tuning_fold_" + \
       str(int(each)).zfill(x)+'.txt', 'a') as f:
     nu = '\n'
     for a in sorted(tuning[each], key=int):
@@ -157,7 +152,7 @@ for each in sorted(tuning, key=int):
 # Writing validation folds
 x = get_zeros(params['k'])
 for each in sorted(validation, key=int):
-  with open(basename + '/' + file_name[:-4] + "_validation_fold_" + \
+  with open(basename + '/' + params['o'] + "_validation_fold_" + \
       str(int(each)).zfill(x)+'.txt', 'a') as f:
     nu = '\n'
     for a in sorted(validation[each], key=int):
