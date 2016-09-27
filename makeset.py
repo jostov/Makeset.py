@@ -138,7 +138,7 @@ except OSError:
 
 datlist = part_data(data, params['p'])
 tuning = split_data(datlist[0], params['j'])
-validation = split_data(datlist[1], params['k'])
+evaluation = split_data(datlist[1], params['k'])
 
 # Writing tuning folds
 x = get_zeros(params['j'])
@@ -152,12 +152,12 @@ for each in sorted(tuning, key=int):
 
 # Writing validation folds
 x = get_zeros(params['k'])
-for each in sorted(validation, key=int):
-  with open(basename + '/' + params['o'] + "_validation_fold_" + \
+for each in sorted(evaluation, key=int):
+  with open(basename + '/' + params['o'] + "_evaluation_fold_" + \
       str(int(each)).zfill(x)+'.txt', 'a') as f:
     nu = '\n'
-    for a in sorted(validation[each], key=int):
-      for j in validation[each][a]:
+    for a in sorted(evaluation[each], key=int):
+      for j in evaluation[each][a]:
         f.write(a + "\t" + "\t".join(map(str, j)) + nu)
 
 print "Successfully partitioned batch" 
