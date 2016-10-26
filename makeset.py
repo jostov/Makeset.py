@@ -58,12 +58,12 @@ def split_data(data, folds, chunk):
 		for each in sorted(data, key=int):
 			current_fold[each] = []
 			for j in range(fold_length[each]):
-				current_fold[each].append(data[each].pop()
+				current_fold[each].append(data[each].pop())
 				fold[i+1] = dict(current_fold)
 	for i in fold:
 		for each in data:
 			if len(data[each]) != 0:
-				fold[i][each].append(data[each].pop()
+				fold[i][each].append(data[each].pop())
 				return fold
 
 # Determines necessary number of leading zeroes
